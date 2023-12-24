@@ -1,7 +1,7 @@
-import CreateForm from "@/app/_components/shared/create-form";
-import DeleteForm from "@/app/_components/shared/delete-form";
 import { getAll } from "@/app/_actions/todo";
+import CreateForm from "@/app/_components/shared/create-form";
 import { unstable_noStore as noStore } from "next/cache";
+import TodoItem from "./_components/shared/todo-item";
 
 export default async function Page() {
   noStore();
@@ -14,13 +14,7 @@ export default async function Page() {
       <CreateForm />
       <ul className="space-y-4 min-w-96">
         {todos.map((todo) => (
-          <li
-            className="border border-slate-200 rounded-md flex justify-between items-center p-4 w-full gap-4"
-            key={todo.id}
-          >
-            <span className="">{todo.title}</span>
-            <DeleteForm id={todo.id} />
-          </li>
+          <TodoItem key={todo.id} todo={todo} />
         ))}
       </ul>
     </main>

@@ -4,18 +4,20 @@ import { db } from "@/app/_lib/db";
 import { sql } from "@vercel/postgres";
 import { todos } from "@/app/_lib/db/schema";
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 export type CreateFormState = {
   errors: Record<string, any>;
 };
 
 export async function getAll() {
-  let todos;
+  let data;
 
   try {
-    todos = await db.query.todos.findMany();
-    return todos;
+    data = await db.query.todos.findMany({
+      orderBy: [asc(todos.id)],
+    });
+    return data;
   } catch (e: any) {
     // Table is not created yet
     if (e.message === `relation "todos" does not exist`) {
@@ -28,8 +30,10 @@ export async function getAll() {
               title TEXT NOT NULL
           );
       `;
-      todos = await db.query.todos.findMany();
-      return todos;
+      data = await db.query.todos.findMany({
+        orderBy: [asc(todos.id)],
+      });
+      return data;
     } else {
       throw e;
     }
@@ -56,6 +60,23 @@ export async function create(prevState: CreateFormState, formData: FormData) {
 export async function remove(id: number) {
   try {
     await db.delete(todos).where(eq(todos.id, id));
+    revalidatePath("/");
+
+    return {
+      errors: {},
+    };
+  } catch (e: any) {
+    return {
+      errors: {
+        remove: e.message,
+      },
+    };
+  }
+}
+
+export async function markDone(id: number, done: boolean) {
+  try {
+    await db.update(todos).set({ done }).where(eq(todos.id, id));
     revalidatePath("/");
 
     return {
