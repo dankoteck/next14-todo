@@ -6,6 +6,8 @@ import TodoItem from "./_components/shared/todo-item";
 export default async function Page() {
   noStore();
 
+  console.log(!!global.db)
+
   const todos = await getAll();
 
   return (
