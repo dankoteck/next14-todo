@@ -10,7 +10,7 @@ declare global {
 let db: PostgresJsDatabase<typeof schema>;
 
 if (process.env.NODE_ENV === "production") {
-  db = drizzle(postgres(process.env.POSTGRES_URL!), { schema });
+  db = drizzle(postgres(`${process.env.POSTGRES_URL!}?sslmode=require`), { schema });
 } else {
   if (!global.db) {
     global.db = drizzle(postgres(process.env.POSTGRES_URL!), { schema });
